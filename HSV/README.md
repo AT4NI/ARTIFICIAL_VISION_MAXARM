@@ -1,27 +1,22 @@
-\## Concepto
+## Concepto
 
-\### HSV
+### HSV
 
 Las siglas significan: Hue (tono), Saturation (saturación), Value (valor o brillo). Es un \*\*modelo de color para procesamiento de imágenes\*\*, porque separa la información del color (tono) de la intensidad (saturación y brillo).
 
 
 
-\- Hue (tono): representa el color, se mide en grados (0 a 179 en OpenCV, donde 0° es rojo, ~60° es amarillo, ~120° es verde, ~180° es azul, etc.).
+- Hue (tono): representa el color, se mide en grados (0 a 179 en OpenCV, donde 0° es rojo, ~60° es amarillo, ~120° es verde, ~180° es azul, etc.).
 
-\- Saturation (saturación): qué tan puro es el color (0 a 255). Un valor bajo indica un color grisáceo, uno alto es color intenso.
+- Saturation (saturación): qué tan puro es el color (0 a 255). Un valor bajo indica un color grisáceo, uno alto es color intenso.
 
-\- Value (valor o brillo): qué tan claro u oscuro es el color (0 a 255). 0 es negro, 255 es brillo máximo.
-
-
-
+- Value (valor o brillo): qué tan claro u oscuro es el color (0 a 255). 0 es negro, 255 es brillo máximo.
 Usamos HSV porque es más robusto para detectar colores que el modelo RGB/BGR clásico, que es sensible a cambios de luz.
 
-\## Código
-
+## Código
 En la siguiente sección se dara una explicación sobre el código desarrollado para el desglose de HSV en 3 pantallas (Original, B/N y Color).
 
-\### Librerías
-
+### Librerías
 ```py
 
 import cv2
@@ -30,14 +25,11 @@ import numpy as np
 
 ```
 
-\- `cv2` es OpenCV, librería para visión artificial.
+- `cv2` es OpenCV, librería para visión artificial.
 
-\- `numpy` es para manipular arreglos, vectores y matrices.
+- `numpy` es para manipular arreglos, vectores y matrices.
 
-
-
-\### Rangos HSV por color
-
+### Rangos HSV por color
 ```py
 
 rojo\_bajo1 = np.array(\[0, 150, 100])
@@ -57,27 +49,12 @@ amarillo\_bajo = np.array(\[20, 150, 100])
 amarillo\_alto = np.array(\[40, 255, 255])
 
 ```
+- Cada color está definido por un rango en HSV.
+- El rojo se detecta en dos rangos porque el tono rojo está al inicio y al final del espectro hue (0-10 y 160-179).
+- Cada `np.array` es `\[Hue, Saturación, Valor]` mínimos o máximos.
+- Estos valores son calibrados previamente y definen qué píxeles serán considerados del color respectivo.
 
-
-
-\- Cada color está definido por un rango en HSV.
-
-
-
-\- El rojo se detecta en dos rangos porque el tono rojo está al inicio y al final del espectro hue (0-10 y 160-179).
-
-
-
-\- Cada `np.array` es `\[Hue, Saturación, Valor]` mínimos o máximos.
-
-
-
-\- Estos valores son calibrados previamente y definen qué píxeles serán considerados del color respectivo.
-
-
-
-\### Diferenciar Formas
-
+### Diferenciar Formas
 ```py
 
 def calcular\_angulos(puntos):
@@ -109,17 +86,10 @@ def calcular\_angulos(puntos):
 &nbsp;   return angs
 
 ```
+- Calcula los ángulos internos de una figura dado un conjunto de puntos (vértices).
+- Esto es útil para diferenciar rectángulos (ángulos ~90°), trapecios, rombos, etc.
 
-\- Calcula los ángulos internos de una figura dado un conjunto de puntos (vértices).
-
-\- Esto es útil para diferenciar rectángulos (ángulos ~90°), trapecios, rombos, etc.
-
-
-
-\###  Pendiente entre dos puntos
-
-
-
+###  Pendiente entre dos puntos
 ```py
 
 def pendiente(p1, p2):
@@ -131,17 +101,10 @@ def pendiente(p1, p2):
 &nbsp;   return (p2\[1] - p1\[1]) / (p2\[0] - p1\[0])
 
 ```
+- Calcula la pendiente entre dos puntos (x,y).
+- Se usa para verificar paralelismo de lados (por ejemplo, para trapecios o rombos).
 
-
-
-\- Calcula la pendiente entre dos puntos (x,y).
-
-\- Se usa para verificar paralelismo de lados (por ejemplo, para trapecios o rombos).
-
-
-
-\### Deteccion (Vértices y Propiedades Geométricas)
-
+### Deteccion (Vértices y Propiedades Geométricas)
 ```py
 
 def detectar\_forma(approx, area, perimetro):
@@ -216,17 +179,12 @@ def detectar\_forma(approx, area, perimetro):
 
 
 
-\- La función usa el número de vértices aproximados para empezar a clasificar la forma.
-
-\- Si es triángulo, retorna "Triángulo".
-
-\- Para 4 vértices, se usa el análisis de lados, ángulos y paralelismo para diferenciar entre rectángulo, rombo o trapecio.
-
-\- Si tiene 6 vértices, se considera hexágono.
-
-\- Más de 6 y con alta circularidad se considera círculo.
-
-\- Retorna "Desconocido" si no encaja en ninguna.
+- La función usa el número de vértices aproximados para empezar a clasificar la forma.
+- Si es triángulo, retorna "Triángulo".
+- Para 4 vértices, se usa el análisis de lados, ángulos y paralelismo para diferenciar entre rectángulo, rombo o trapecio.
+- Si tiene 6 vértices, se considera hexágono.
+- Más de 6 y con alta circularidad se considera círculo.
+- Retorna "Desconocido" si no encaja en ninguna.
 
 
 
