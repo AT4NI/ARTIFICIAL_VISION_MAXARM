@@ -114,6 +114,104 @@ def detectar_forma(approx, area, perimetro):
 - Más de 6 y con alta circularidad se considera círculo.
 - Retorna "Desconocido" si no encaja en ninguna.
 
+### Color Predominante
+```py
+def detectar_color(hsv, contorno):
+    mask = np.zeros(hsv.shape[:2], dtype=np.uint8)
+    cv2.drawContours(mask, [contorno], -1, 255, -1)  # Rellenar el contorno en máscara
+    mean = cv2.mean(hsv, mask=mask)  # Media HSV dentro del contorno
+    h, s, v = mean[:3]
 
+    # Comprobar rojo (dos rangos)
+    if ((rojo_bajo1[0] <= h <= rojo_alto1[0]) or (rojo_bajo2[0] <= h <= rojo_alto2[0])) and s >= 150 and v >= 100:
+        return "Rojo"
+    elif azul_bajo[0] <= h <= azul_alto[0] and s >= 150 and v >= 100:
+        return "Azul"
+    elif amarillo_bajo[0] <= h <= amarillo_alto[0] and s >= 150 and v >= 100:
+        return "Amarillo"
+    else:
+        return "Otro"
+```
+- Crea una máscara solo del contorno.
+- Calcula la media de HSV en esa zona.
+- Determina el color comparando con los rangos HSV calibrados.
+- Si no está dentro de los rangos, retorna "Otro".
 
+### Inicialización de la cámara y ventana
+```py
+cv2.namedWindow("Camara", cv2.WINDOW_AUTOSIZE)
+cap = cv2.VideoCapture(0)
+
+if not cap.isOpened():
+    print("No se pudo abrir la cámara.")
+    exit()
+
+print("Cámara abierta correctamente. Presiona 's' para salir.")
+```
+- Se crea una ventana con nombre fija para evitar múltiples ventanas.
+- Se abre la cámara (índice 0).
+- Se verifica que la cámara esté lista.
+
+## Bucle Principal (Captura y Procesamiento)
+```py
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("No se pudo leer imagen.")
+        break
+
+    # Reducimos tamaño para mejor rendimiento
+    frame = cv2.resize(frame, (320, 240))
+
+    # Aplicamos desenfoque para reducir ruido
+    img_blur = cv2.GaussianBlur(frame, (5, 5), 1)
+
+    # Convertimos a HSV para detección de color
+    img_hsv = cv2.cvtColor(img_blur, cv2.COLOR_BGR2HSV)
+
+    # Convertimos a gris para detectar bordes
+    img_gray = cv2.cvtColor(img_blur, cv2.COLOR_BGR2GRAY)
+
+    # Detectamos bordes con Canny
+    img_canny = cv2.Canny(img_gray, 50, 150)
+
+    # Encontramos contornos
+    contornos, _ = cv2.findContours(img_canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    for cnt in contornos:
+        area = cv2.contourArea(cnt)
+        if area > 1000:  # Filtrar áreas pequeñas/no relevantes
+            perimetro = cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, 0.02 * perimetro, True)
+
+            # Detectar forma y color
+            forma = detectar_forma(approx, area, perimetro)
+            color = detectar_color(img_hsv, cnt)
+
+            if forma != "Desconocido" and color != "Otro":
+                x, y, w, h = cv2.boundingRect(approx)
+                etiqueta = f"{forma} {color}"
+
+                # Dibujar contorno y etiquetas en la imagen
+                cv2.drawContours(frame, [approx], -1, (0, 255, 0), 2)
+                cv2.putText(frame, etiqueta, (x, y - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 255), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 255), 2)
+
+    # Mostrar el resultado final
+    cv2.imshow("Camara", frame)
+
+    # Salir si presionas 's'
+    if cv2.waitKey(1) & 0xFF == ord('s'):
+        print("Finalizando...")
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+```
+- Capturamos cada frame, filtramos, detectamos bordes y contornos.
+- Para cada contorno significativo, detectamos la forma y el color.
+- Si ambos son válidos, dibujamos la figura y escribimos el texto con forma y color.
+- Solo hay una ventana que se actualiza, evitando el problema de ventanas múltiples.
+- Se sale con la tecla 's'.
 
