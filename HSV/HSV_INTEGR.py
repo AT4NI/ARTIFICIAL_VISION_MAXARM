@@ -92,17 +92,17 @@ cv2.namedWindow("Camara", cv2.WINDOW_AUTOSIZE)
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
-    print("❌ No se pudo abrir la cámara.")
+    print("No se pudo abrir la cámara.")
     exit()
 
-print("✅ Cámara abierta correctamente. Presiona 's' para salir.")
+print("Cámara abierta correctamente. Presiona 's' para salir.")
 
 # ------- Bucle principal -------
 
 while True:
     ret, frame = cap.read()
     if not ret:
-        print("⚠️ No se pudo leer imagen.")
+        print("No se pudo leer imagen.")
         break
 
     frame = cv2.resize(frame, (320, 240))
@@ -134,7 +134,7 @@ while True:
     cv2.imshow("Camara", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('s'):
-        print("🛑 Finalizando...")
+        print("Finalizando...")
         break
 
 cap.release()
