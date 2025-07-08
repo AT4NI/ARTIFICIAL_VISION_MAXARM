@@ -1,6 +1,6 @@
 ## Detección de Colores con Filtros HSV
 
-### CONCEPTO
+### Concepto
 
 El modelo de color **HSV (Hue, Saturation, Value)** es una representación más intuitiva para segmentación de colores que el modelo RGB. Separar el tono (**Hue**) de la intensidad (**Value**) y saturación (**Saturation**) permite detectar colores de manera más robusta, incluso en condiciones de iluminación variables. Este sistema es ampliamente utilizado en visión por computadora y robótica.
 
@@ -8,16 +8,7 @@ En este proyecto, se implementa un sistema de calibración interactivo basado en
 
 ---
 
-### 📌 ¿Por qué es relevante?
-
-- Permite ajustar dinámicamente los rangos de detección de colores.
-- Evita errores por condiciones de luz cambiantes.
-- Prepara datos fiables para etapas posteriores como detección de formas o control robótico.
-- Incluye filtrado previo para reducir ruido y mejorar precisión.
-
----
-
-### ⚙️ Descripción paso a paso del código
+### Descripción detallada del código
 
 ```python
 import cv2
@@ -57,13 +48,9 @@ cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("No se pudo abrir la cámara.")
     exit()
-```
-**Inicialización de cámara:** se abre la cámara y se verifica que funcione correctamente.
-
-```python
 print("Cámara iniciada con filtros. Ajusta sliders. Presiona 's' para salir.")
 ```
-**Mensaje de bienvenida al usuario.**
+**Inicialización de cámara:** se abre la cámara y se verifica que funcione correctamente. Se muestra mensaje de bienvenida.
 
 ```python
 while True:
