@@ -1,4 +1,4 @@
-## INTEGRACION DE VISION ARTIFICIAL A UN BRAZO ROBOTICO de 4 grados
+## INTEGRACION DE VISION ARTIFICIAL A UN BRAZO ROBOTICO DE 4 GRADOS
 ### OBJETIVO
 Este proyecto tiene como objetivo desarrollar un sistema capaz de identificar y clasificar objetos físicos en tiempo real, utilizando criterios visuales como el color y la forma geométrica.
 ### METODOLOGÍA
